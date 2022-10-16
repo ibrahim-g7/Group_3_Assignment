@@ -1,0 +1,119 @@
+---
+title: "NYC Flight Delay Report"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE)
+library(tidyverse)
+library(dplyr)
+library(janitor)
+library(DataExplorer)
+library(nycflights13)
+library(scales)
+library(ggridges)
+library(reactable)
+flight <- nycflights13::flights %>%
+    remove_constant() %>%
+    drop_na(dep_time)
+
+```
+
+## Introduction and Sceniaro 
+
+* Dataset introduction.
+* Locations.
+* Tables.
+
+## Introduction and Scenarios
+In our presentation we will be looking at the delay in:
+
+* Different moths of the year
+* Different airports
+* The average delay for each carrier
+* And the overall distribution of delays
+
+## Exploratory Data Analysis
+* The flights dataset has 328,521 rows and 19 columns.
+* Three origin airport.
+* 105 destination airports.
+* 16 carriers.
+* We removed the years column because it has the same value for all the rows, and we removed the rows that had missing values for the departure time.
+ 
+
+## Exploratory Data Analysis
+### Check which airport has the most flights
+```{r}
+flight %>%
+    count(origin) %>%
+    arrange(desc(n))
+```
+
+### Check which airport has the most delays
+```{r}
+flight %>%
+    filter(dep_delay > 0) %>%
+    count(origin) %>%
+    arrange(desc(n))
+```
+
+## Exploratory Data Analysis
+### Check the proportion of delay to the number flights
+
+```{r}
+flight %>%
+    filter(dep_delay > 0) %>%
+    count(origin) %>%
+    mutate(prop = n / sum(n)) %>%
+    arrange(desc(prop))
+```
+
+## Key investigations results from the data
+### Which month has the most delays?
+
+```{r}
+flight %>%
+  filter(dep_delay > 0) %>%
+  group_by(month, origin) %>%
+  summarise(count=n()) %>%
+  ggplot(aes(month, count, color = origin))+
+  geom_point(shape = 4) +
+  geom_line() +
+  scale_x_continuous("Month", n.breaks = 12) +
+  scale_y_continuous("Count of delays") +
+  ggtitle("Delays count by month from all NYC airport.") +
+  theme_classic()
+```
+
+## Key investigations results from the data
+### What is the distribution of all delays?
+
+```{r}
+ggplot(flight, aes(x = dep_delay)) +
+  geom_histogram(bins = 80) +
+  scale_x_continuous(limits = c(-100, 500))
+```
+
+## Key investigations results from the data
+### What is the average delay for each airline?
+
+```{r}
+flight %>%
+  group_by(carrier) %>%
+  summarise(avg = mean(dep_delay), std = sd(dep_delay)) %>%
+  ggplot(aes(carrier, avg)) +
+  geom_col() +
+  #geom_errorbar(aes(ymin=avg-std, ymax=avg+std))+
+  scale_y_continuous("Average delay in min") +
+  scale_x_discrete("Carrier") +
+  ggtitle("Average delay in minute for each carrier thorughout 2013") +
+  theme_classic()
+```
+
+## Takeaways
+
+* Most flights and delays happen during the summer months.
+* The proportion of delays increases with the number of flights.
+* F9 has the highest average delay.
+
+
