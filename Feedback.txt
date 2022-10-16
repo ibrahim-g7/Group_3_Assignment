@@ -1,0 +1,5 @@
+1.  It is good that they cover all the required components.
+2.  They should justify why they chose to remove the rows that had missing values for the departure time.
+3.  The plot of "distribution of all delays" was not clear what are the units of x-axis values.
+4.  "The proportion of delays increases with the number of flights." The information of this point was not explained in the presentation. How did they get this information?
+5. When coming up with the questions to navigate their analysis, it seems that Name Error didn't let the answers to those questions influence other questions.
